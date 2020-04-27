@@ -16,8 +16,8 @@ import math
 print('model4 8步滑动窗口预测4步')
 
 trainingdata,testdata,testname = Getdata(12)
-    
- 
+testname.remove(testname[30])
+
 train_X = []
 train_Y = []
 for i in trainingdata:
@@ -28,6 +28,7 @@ for i in trainingdata:
 train_X = np.array(train_X)
 train_Y = np.array(train_Y)
     
+
 test_X = []
 test_Y = []
 tsX = []
@@ -39,6 +40,12 @@ for i in testdata:
 test_X = paddata(test_X,lenMax(test_X),2)
 test_Y = np.array(test_Y)
 
+# Nodes = [4,8,16]
+
+# for Node in Nodes:
+Node = 16
+Loss = []
+#for Node in Nodes:
 model4 = tf.keras.models.Sequential([
     
     
@@ -54,7 +61,7 @@ model4 = tf.keras.models.Sequential([
     #                       recurrent_activation = "sigmoid",
     #                       ),
 
-    tf.keras.layers.LSTM(16,
+    tf.keras.layers.LSTM(Node,
                         #  input_shape=padtrain_X.shape[-2:],
                           use_bias = True,
                           bias_initializer="zeros",
@@ -71,18 +78,23 @@ model4 = tf.keras.models.Sequential([
 
 model4.compile(loss='mse', optimizer =tf.keras.optimizers.Adam(learning_rate=0.0005, beta_1=0.9, beta_2=0.999))
 
-history = model4.fit(train_X,train_Y,epochs=200,
-                                             
-                                          validation_split = 0.2,
+history = model4.fit(
+                        train_X,train_Y,epochs=150,
+                        validation_split = 0.2,
                                           
                                           )
-modelname = 'model4 8steps 16'
 
-PrintLossFig(history,modelname+'Training and validation loss')
+
+loss = np.average(history.history['loss'][-10:])
+valloss = np.average(history.history['val_loss'][-10:])
+Loss.append([loss,valloss])
+modelname = 'model4 8steps '+str(Node)
+
+#PrintLossFig(history,modelname+'Training and validation loss')
 
 pre = model4.predict(test_X)
 #pre = forecast(test_X,model4,8)
-testname.remove(testname[30])
+
 PlotAllmul(tsX,test_Y,pre,modelname,testname)
 
 

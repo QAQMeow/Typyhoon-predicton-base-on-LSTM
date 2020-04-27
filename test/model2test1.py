@@ -13,7 +13,7 @@ from paper.Getdata import *
 import random 
 import math
 
-print('model8 4步滑动窗口一步')
+print('model2-1 4步滑动窗口一步')
 
 trainingdata,testdata,testname = Getdata(8)
     
@@ -39,7 +39,7 @@ for i in testdata:
 #test_X = Paddingdata(test_X,lenMax(test_X))
 test_X = np.array(test_X)
 test_Y = np.array(test_Y)
-
+Loss = []
 model8 = tf.keras.models.Sequential([
     
     
@@ -72,17 +72,22 @@ model8 = tf.keras.models.Sequential([
 
 model8.compile(loss='mse', optimizer =tf.keras.optimizers.Adam(learning_rate=0.0005, beta_1=0.9, beta_2=0.999))
 
-history = model8.fit(train_X,train_Y,epochs=200,
+history = model8.fit(train_X,train_Y,epochs=150,
                                                
                                          validation_split = 0.2,
                                           
                                           )
-modelname = 'model8 4steps 4'
+
+loss = np.average(history.history['loss'][-10:])
+valloss = np.average(history.history['val_loss'][-10:])
+Loss.append([loss,valloss])
+
+modelname = 'model2-1 4steps '
 PrintLossFig(history,modelname+' Training and validation loss')
 
 pre = model8.predict(test_X)
 
-pre = forecast2(test_X,test_Y,model8,4)
+pre = forecast(test_X,model8,4)
 
 testname.remove(testname[30])
 PlotAllmul(tsX,test_Y,pre,modelname,testname)

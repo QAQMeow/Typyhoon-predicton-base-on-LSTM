@@ -13,7 +13,7 @@ from paper.Getdata import *
 import random 
 import math
 
-print('model6 16步滑动窗口预测4步')
+print('model5 16步滑动窗口预测4步')
 
 trainingdata,testdata,testname = Getdata(8)
 
@@ -44,10 +44,12 @@ for i in testdata:
 #test_X = Paddingdata(test_X,lenMax(test_X))
 test_X = np.array(test_X)
 test_Y = np.array(test_Y)
-
+Loss = []
 model6 = tf.keras.models.Sequential([
     
-    
+     tf.keras.layers.Masking(mask_value=0.,
+                                # input_shape=padtrain_X.shape[-2:]                    
+                            ),
     # tf.keras.layers.LSTM(16,
     #                     # input_shape=padtrain_X.shape[-2:],
     #                       return_sequences=True, 
@@ -60,7 +62,7 @@ model6 = tf.keras.models.Sequential([
     #                       recurrent_activation = "sigmoid",
     #                       ),
 
-    tf.keras.layers.LSTM(8,
+    tf.keras.layers.LSTM(16,
                         #  input_shape=padtrain_X.shape[-2:],
                           use_bias = True,
                           bias_initializer="zeros",
@@ -77,12 +79,15 @@ model6 = tf.keras.models.Sequential([
 
 model6.compile(loss='mse', optimizer =tf.keras.optimizers.Adam(learning_rate=0.0005, beta_1=0.9, beta_2=0.999))
 
-history = model6.fit(train_X,train_Y,epochs=200,
+history = model6.fit(train_X,train_Y,epochs=150,
                                                
                                          validation_split = 0.2,
                                           
                                           )
-modelname = 'model6 16steps 8'
+loss = np.average(history.history['loss'][-10:])
+valloss = np.average(history.history['val_loss'][-10:])
+Loss.append([loss,valloss])
+modelname = 'model6 16steps '
 PrintLossFig(history,modelname+' Training and validation loss')
 
 pre = model6.predict(test_X)

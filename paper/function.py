@@ -268,4 +268,12 @@ def Plotbtwsingle(test_X):
                 ax[x,y].plot(PT[i][0],PT[i][1])
             i += 1 
     
+  
+def PlotTytr(seq,title):
+    
+    plt.figure(figsize=(11,8))
+    plt.title(title)
+    R = np.array(seq)
+    plt.plot(R[:,1],R[:,0])
+    plt.show()
     

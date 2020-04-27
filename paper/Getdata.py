@@ -112,10 +112,10 @@ def Getdata(minLens):
     value = list(Tp.values())  #台风路径数据
      
     Lens = []                  #路径步长
-    lessthan8 = 0              #步长小于8步个数
-    rmIndex  =[]               #需要移除路径步长小于8的索引值（list下标）
+    lessthan8 = 0              #步长小于8和大于60个数
+    rmIndex  =[]               #需要移除的索引值（list下标）
     for i in range(len(value)):
-        if len(value[i])<minLens or len(value[i])>80:
+        if len(value[i])<minLens or len(value[i])>65:
             lessthan8+=1
             rmIndex.append(i)
             

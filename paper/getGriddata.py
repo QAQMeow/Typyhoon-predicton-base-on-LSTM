@@ -128,7 +128,38 @@ for i in range(len(Name)):
     if Name[i][0:2] == '18':
         DivIndex = i
         break
-
+def FindIndex(A,N):
+    index = -1
+    
+    for j in range(len(A)):
+        if A[j] == N:
+            index = j
+            break        
+    return index
+    
+#二分法查找下标
+def binary_search(A,key):
+    left = 0
+    right = len(A) - 1
+    while left <= right:
+        mid = (left + right) 
+        if key > A[mid]:
+            left = mid + 1
+        elif key < A[mid]:
+            right = mid - 1
+        else:
+            return mid
+    else:
+        return -1
+    
+def str2date(s):
+    time = s
+    Year = int(time[:4])
+    month = int(time[4:6])
+    day = int(time[6:8])
+    hour = int(time[8:])
+    TT = date2num(datetime(Year,month,day,hour),units=Time.units)
+    return TT
 
 #训练集
 traindata = value[:DivIndex]
@@ -154,30 +185,6 @@ Vwind = VData.variables['vwnd']
 Wwind = WData.variables['omega']
 Pre = PData.variables['hgt']
 
-def FindIndex(A,N):
-    index = None
-    
-    for j in range(len(A)):
-        if A[j] == N:
-            index = j
-            break        
-    return index
-    
-#二分法查找下标
-def binary_search(A,key):
-    left = 0
-    right = len(A) - 1
-    while left <= right:
-        mid = (left + right) 
-        if key > A[mid]:
-            left = mid + 1
-        elif key < A[mid]:
-            right = mid - 1
-        else:
-            return mid
-    else:
-        return -1
-    
 
 #选择500hPa等压面数据
 layer= None
@@ -205,7 +212,6 @@ for i in range(len(Lat)):
 
 #
 Trdata = []
-m = 0
 R = list(Time[:])
 Timeindex = []
 for i in traindata:
@@ -218,19 +224,52 @@ for i in traindata:
         hour = int(time[8:])
         TT = date2num(datetime(Year,month,day,hour),units=Time.units)
         index = FindIndex(R,TT)
-        m = index
         Timeindex.append(index)
         A.append(Tem[index,layer,latmin:latmax,lonmin:lonmax])
     Trdata.append(np.array(A))        
 
 Trdata = np.array(Trdata)
+Tedata = []
+
+for i in testdata:
+    A = []
+    for j in i:
+        time = str(j[2])
+        Year = int(time[:4])
+        month = int(time[4:6])
+        day = int(time[6:8])
+        hour = int(time[8:])
+        TT = date2num(datetime(Year,month,day,hour),units=Time.units)
+        index = FindIndex(R,TT)
+        A.append(Tem[index,layer,latmin:latmax,lonmin:lonmax])
+    Tedata.append(A)
+Tedata = np.array(Tedata)
 
 
+Train = []
+for i in traindata:
+    a = []
+    for j in i:
+        a.append([j[0],j[1]])
+    Train.append(np.array(a))
+Test = []
+for i in testdata:
+    a = []
+    for j in i:
+        a.append([j[0],j[1]])
+    Test.append(np.array(a))
 
+seq = tf.keras.models.Sequential()
+seq.add(tf.keras.layers.Masking(mask_value=0.))
+seq.add(tf.keras.layers.ConvLSTM2D(filters=2,kernel_size=(3, 3)))
 
+seq.compile(loss='mean_squared_error', optimizer='adadelta')
+Trdata = tf.keras.preprocessing.sequence.pad_sequences(Trdata,padding = 'post')
+a = Trdata
+Trdata = tf.keras.backend.reshape(Trdata,[1521, 101, 24, 44,1])
+Test = tf.keras.preprocessing.sequence.pad_sequences(Test,padding = 'post')
+Train = tf.keras.preprocessing.sequence.pad_sequences(Train,padding = 'post')
 
-
-
-
+#seq.fit(Trdata,Train)
 
 

@@ -16,6 +16,7 @@ print('model1 全序列预测最后四步')
 
 trainingdata,testdata,testname = Getdata(8)
 
+testname.remove(testname[30])
 
 
 
@@ -40,15 +41,17 @@ train_Y = np.array(train_Y)
 test_Y = np.array(test_Y)
 
 
+# Nodes = [4,8,16]
+
+# for Node in Nodes:
+Node = 16
+Loss = []
 model1 = tf.keras.models.Sequential([
     tf.keras.layers.Masking(mask_value=0.,
-                                # input_shape=padtrain_X.shape[-2:]
-                        
+                                # input_shape=padtrain_X.shape[-2:]                    
                             ),
     
-
-    tf.keras.layers.LSTM(16,
-                          #return_sequences=True, 
+    tf.keras.layers.LSTM(Node,
                           use_bias = True,
                           bias_initializer="zeros",
                           kernel_initializer = tf.keras.initializers.glorot_normal(), #权值初始化
@@ -68,22 +71,23 @@ model1 = tf.keras.models.Sequential([
 
 model1.compile(loss='mse', optimizer =tf.keras.optimizers.Adam(learning_rate=0.0005, beta_1=0.9, beta_2=0.999))
 
-history = model1.fit(padtrain_X,train_Y,epochs=200,
-                                          
-                                          validation_split = 0.2,
-                                          
+history = model1.fit(
+                        padtrain_X,train_Y,epochs=150,
+                        validation_split = 0.2,
                                           )
 
-modelname = 'model1 16 '
-PrintLossFig(history,modelname+' Training and validation loss')
-
+loss = np.average(history.history['loss'][-10:])
+valloss = np.average(history.history['val_loss'][-10:])
+Loss.append([loss,valloss])
+modelname = 'model1 '+str(Node)
+#PrintLossFig(history,modelname+' Training and validation loss')
 pre = model1.predict(padtest_X)
-
-testname.remove(testname[30])
 PlotAllmul(tsX,test_Y,pre,modelname,testname)
 
 
-ind = 5
+
+
+ind = 22
 a = tf.keras.losses.mean_squared_error(pre[ind,:,0], test_Y[ind,:,0]).numpy()
 b = tf.keras.losses.mean_squared_error(pre[ind,:,1], test_Y[ind,:,1]).numpy()
 print('lat:',a,'lon:',b)

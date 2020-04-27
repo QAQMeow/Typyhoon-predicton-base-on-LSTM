@@ -35,9 +35,7 @@ def dtwprog(data1,seq):
     
     return traindata
 
-traindata = dtwprog(trainingdata,testdata[5])
-
-da = [5,20,25]
+da = [5,20,22,25]
 for ind in da:
     preseq = testdata[ind]
     traindata = dtwprog(trainingdata,preseq)
@@ -92,12 +90,12 @@ for ind in da:
     
     modeld.compile(loss='mse', optimizer =tf.keras.optimizers.Adam(learning_rate=0.0005, beta_1=0.9, beta_2=0.999))
     
-    history = modeld.fit(train_X,train_Y,epochs=100,
+    history = modeld.fit(train_X,train_Y,epochs=150,
                                                    
                                               validation_split = 0.2,
                                               
                                               )
-    modelname = 'modeldtw 4stepsto1 16'
+    modelname = 'modeldtw '
     #PrintLossFig(history,modelname+' Training and validation loss')
     
     pre = modeld.predict(test_X)

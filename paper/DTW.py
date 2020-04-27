@@ -75,13 +75,25 @@ def DTW(l1,l2):#D 距离矩阵 A 累计矩阵
     
 def plotDTW(D,path):
     plt.figure(figsize=(12,14))
-    plt.imshow(D, interpolation='nearest', cmap='Reds') 
+    plt.imshow(D, interpolation='nearest', cmap='binary') 
     plt.plot(path[:,0],path[:,1])
     plt.gca().invert_yaxis()#倒转y轴，让它与x轴的都从左下角开始
     plt.xlabel("X")
     plt.ylabel("Y")
-#    plt.grid()
-    plt.colorbar()
+    #plt.grid()
+    plt.colorbar(fraction=0.045, pad=0.1)
+   
+    
+def plotdtw(D,path):
+    plt.figure(figsize=(12,14))
+    plt.imshow(D, interpolation='nearest', cmap='binary') 
+    plt.plot(path[0],path[1])
+    plt.gca().invert_yaxis()#倒转y轴，让它与x轴的都从左下角开始
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    #plt.grid()
+    plt.colorbar(fraction=0.045, pad=0.1)
+
     
 def dtwprog(data1,seq):
     s = []
@@ -92,14 +104,12 @@ def dtwprog(data1,seq):
     traindata = []
     index = int(len(s)*0.33)
     for i in range(index):
-        
         traindata.append(data1[s[i][1]])
-    
     return traindata
 
-def plotseq(data):
-    fig,ax = plt.subplots(1,5,figsize = (10,2))
-    #fig.suptitle(title,fontsize=50)
+def plotseq(data,title):
+    fig,ax = plt.subplots(1,5,figsize = (15,3))
+    fig.suptitle(title,fontsize=15)
     PT = []
     for i in range(len(data)):
         X = []
@@ -115,18 +125,29 @@ def plotseq(data):
     for y in range(5): 
         if i < len(data):
             ax[y].plot(PT[i][0],PT[i][1])
+            ax[y].set_xticks([])
+            ax[y].set_yticks([])
         i += 1 
  
-for i in [5,20,25]:
-    A = []
-    preseq = testdata[i]
-    A.append(preseq)
-    traindata = dtwprog(trainingdata,preseq)[:4]
-    for i in traindata:
-        A.append(i)
-    
-    plotseq(A)
+# for i in [5,20,22,25]:
+#     A = []
+#     preseq = testdata[i]
+#     A.append(preseq)
+#     traindata = dtwprog(trainingdata,preseq)[:4]
+#     for j in traindata:
+#         A.append(j)
+#     plotseq(A,testname[i])
 
+# seq = testdata[5]
+# A = DTW(seq,testdata[26])[1]
+# pa = DTW(seq,testdata[26])[2]
+# plotDTW(A,pa)
 
+# tr = dtwprog(trainingdata,seq)
+# A1 = DTW(seq,tr[0])[1]
+# pa1 = DTW(seq,tr[0])[2]
+# plotDTW(A1,pa1)
 
+# PlotTytr(seq,testname[5])
+# PlotTytr(testdata[26],testname[26])
 
